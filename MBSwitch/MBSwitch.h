@@ -16,6 +16,7 @@
 @property(nonatomic, assign) UIColor *thumbTintColor UI_APPEARANCE_SELECTOR;
 
 @property(nonatomic,getter=isOn) BOOL on;
+@property(nonatomic, assign) float thumbPadding;
 
 - (id)initWithFrame:(CGRect)frame;
 
