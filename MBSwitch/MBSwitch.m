@@ -15,7 +15,8 @@
     CAShapeLayer *_fillLayer;
     CAShapeLayer *_backLayer;
     BOOL _dragging;
-    BOOL _on;
+	BOOL _on;
+	float _thumbPadding;
 }
 @property (nonatomic, assign) BOOL pressed;
 - (void) setBackgroundOn:(BOOL)on animated:(BOOL)animated;
@@ -59,8 +60,8 @@
     _on = NO;
     _pressed = NO;
     _dragging = NO;
-    
-    
+	_thumbPadding = 3.0;
+	
     _backLayer = [[CAShapeLayer layer] retain];
     _backLayer.backgroundColor = [[UIColor clearColor] CGColor];
     _backLayer.frame = self.bounds;
@@ -73,7 +74,7 @@
     
     _fillLayer = [[CAShapeLayer layer] retain];
     _fillLayer.backgroundColor = [[UIColor clearColor] CGColor];
-    _fillLayer.frame = CGRectInset(self.bounds, 1.5, 1.5);
+    _fillLayer.frame = self.bounds;
     CGPathRef path = [UIBezierPath bezierPathWithRoundedRect:_fillLayer.bounds cornerRadius:floorf(_fillLayer.bounds.size.height/2.0)].CGPath;
     _fillLayer.path = path;
     [_fillLayer setValue:[NSNumber numberWithBool:YES] forKey:@"isVisible"];
@@ -83,7 +84,7 @@
     
     _thumbLayer = [[CAShapeLayer layer] retain];
     _thumbLayer.backgroundColor = [[UIColor clearColor] CGColor];
-    _thumbLayer.frame = CGRectMake(1.0, 1.0, self.bounds.size.height-2.0, self.bounds.size.height-2.0);
+    _thumbLayer.frame = CGRectMake(_thumbPadding, _thumbPadding, self.bounds.size.height-(_thumbPadding*2), self.bounds.size.height-(_thumbPadding*2));
     _thumbLayer.cornerRadius = _thumbLayer.frame.size.height/2.0;
     CGPathRef knobPath = [UIBezierPath bezierPathWithRoundedRect:_thumbLayer.bounds cornerRadius:floorf(_thumbLayer.bounds.size.height/2.0)].CGPath;
     _thumbLayer.path = knobPath;
@@ -117,7 +118,7 @@
 }
 
 - (void) setOn:(BOOL)on {
-    [self setOn:on animated:NO];
+    [self setOn:on animated:YES];
 }
 
 - (void)setOn:(BOOL)on animated:(BOOL)animated {
@@ -196,6 +197,16 @@
     }
 }
 
+- (float) thumbPadding {
+	return _thumbPadding;
+}
+
+- (void) setThumbPadding:(float)thumbPadding {
+	_thumbPadding = thumbPadding;
+	_thumbLayer.frame = CGRectMake(_thumbPadding, _thumbPadding, self.bounds.size.height-(_thumbPadding*2), self.bounds.size.height-(_thumbPadding*2));
+	[self layoutIfNeeded];
+}
+
 #pragma mark -
 #pragma mark Appearance
 
@@ -258,8 +269,8 @@
 
 - (void)toggleDragged:(UIPanGestureRecognizer *)gesture
 {
-	CGFloat minToggleX = 1.0;
-	CGFloat maxToggleX = self.bounds.size.width-self.bounds.size.height+1.0;
+	CGFloat minToggleX = _thumbPadding;
+	CGFloat maxToggleX = self.bounds.size.width-self.bounds.size.height+_thumbPadding;
     
 	if (gesture.state == UIGestureRecognizerStateBegan)
 	{
@@ -339,10 +350,10 @@
 #pragma mark Thumb Frame
 
 - (CGRect) thumbFrameForState:(BOOL)isOn {
-    return CGRectMake(isOn ? self.bounds.size.width-self.bounds.size.height+1.0 : 1.0,
-                      1.0,
-                      self.bounds.size.height-2.0,
-                      self.bounds.size.height-2.0);
+    return CGRectMake(isOn ? self.bounds.size.width-self.bounds.size.height+_thumbPadding : _thumbPadding,
+                      _thumbPadding,
+                      self.bounds.size.height-(_thumbPadding*2),
+                      self.bounds.size.height-(_thumbPadding*2));
 }
 
 #pragma mark -
