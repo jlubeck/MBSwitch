@@ -14,6 +14,7 @@
     CAShapeLayer *_thumbLayer;
     CAShapeLayer *_fillLayer;
     CAShapeLayer *_backLayer;
+	CAShapeLayer *_textLayer;
     BOOL _dragging;
 	BOOL _on;
 	float _thumbPadding;
@@ -94,7 +95,15 @@
     _thumbLayer.shadowRadius = 3.0;
     _thumbLayer.shadowOpacity = 0.3;
     [self.layer addSublayer:_thumbLayer];
-    
+	
+	_textLayer = [[CATextLayer alloc] init];
+	[_textLayer setFont:@"Helvetica-Bold"];
+	[_textLayer setFontSize:20];
+	[_textLayer setFrame:CGRectMake(0, 13, self.bounds.size.height-(_thumbPadding*2), self.bounds.size.height-(_thumbPadding*2))];
+	[_textLayer setString:@"OFF"];
+	[_textLayer setAlignmentMode:kCAAlignmentCenter];
+	[_thumbLayer addSublayer:_textLayer];
+	
 	UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                                                             action:@selector(tapped:)];
 	[tapGestureRecognizer setDelegate:self];
@@ -149,18 +158,28 @@
     BOOL isOn = [[_backLayer valueForKey:@"isOn"] boolValue];
     if (on != isOn) {
         [_backLayer setValue:[NSNumber numberWithBool:on] forKey:@"isOn"];
+		[_textLayer setString: on ? @"ON" : @"OFF"];
         if (animated) {
-            CABasicAnimation *animateColor = [CABasicAnimation animationWithKeyPath:@"fillColor"];
+			CABasicAnimation *animateColor = [CABasicAnimation animationWithKeyPath:@"fillColor"];
+			CABasicAnimation *animateTextColor = [CABasicAnimation animationWithKeyPath:@"foregroundColor"];
             animateColor.duration = 0.22;
             animateColor.fromValue = on ? (id)_tintColor.CGColor : (id)_onTintColor.CGColor;
             animateColor.toValue = on ? (id)_onTintColor.CGColor : (id)_tintColor.CGColor;
             animateColor.removedOnCompletion = NO;
             animateColor.fillMode = kCAFillModeForwards;
-            [_backLayer addAnimation:animateColor forKey:@"animateColor"];
+			animateTextColor.duration = animateColor.duration;
+			animateTextColor.fromValue = on ? (id)_fillLayer.fillColor : (id)_onTintColor.CGColor;
+			animateTextColor.toValue = on ? (id)_onTintColor.CGColor : (id)_fillLayer.fillColor;
+			animateTextColor.removedOnCompletion = animateColor.removedOnCompletion;
+			animateTextColor.fillMode = animateColor.fillMode;
+			[_backLayer addAnimation:animateColor forKey:@"animateColor"];
+			[_textLayer addAnimation:animateTextColor forKey:@"animateColor"];
             [CATransaction commit];
         }else {
             [_backLayer removeAllAnimations];
             _backLayer.fillColor = on ? _onTintColor.CGColor : _tintColor.CGColor;
+			[_textLayer removeAllAnimations];
+			[_textLayer setForegroundColor: _backLayer.fillColor];
         }
     }
 }
@@ -238,6 +257,7 @@
 
 - (void) setOffTintColor:(UIColor *)offTintColor {
     _fillLayer.fillColor = [offTintColor CGColor];
+	[_textLayer setForegroundColor:_fillLayer.fillColor];
 }
 
 - (UIColor *) offTintColor {
