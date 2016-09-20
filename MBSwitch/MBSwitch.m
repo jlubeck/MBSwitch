@@ -97,6 +97,7 @@
     [self.layer addSublayer:_thumbLayer];
     
     _textLayer = [[CATextLayer alloc] init];
+    _textLayer.contentsScale = [[UIScreen mainScreen] scale];
     [_textLayer setFont:@"Helvetica-Bold"];
     [_textLayer setFontSize:20];
     [_textLayer setFrame:CGRectMake(0, 13, self.bounds.size.height-(_thumbPadding*2), self.bounds.size.height-(_thumbPadding*2))];
