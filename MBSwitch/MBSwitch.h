@@ -17,6 +17,7 @@
 
 @property(nonatomic,getter=isOn) BOOL on;
 @property(nonatomic, assign) float thumbPadding;
+@property (nonatomic, assign) BOOL pressed;
 
 - (id)initWithFrame:(CGRect)frame;
 
