@@ -19,7 +19,6 @@
 	BOOL _on;
 	float _thumbPadding;
 }
-@property (nonatomic, assign) BOOL pressed;
 - (void) setBackgroundOn:(BOOL)on animated:(BOOL)animated;
 - (void) showFillLayer:(BOOL)show animated:(BOOL)animated;
 - (CGRect) thumbFrameForState:(BOOL)isOn;
